@@ -2,7 +2,7 @@ from enum import unique
 import uuid
 from app import db
 from sqlalchemy.sql.schema import Column
-from sqlalchemy.sql.sqltypes import String
+from sqlalchemy.sql.sqltypes import Boolean, String
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from flask_sqlalchemy import SQLAlchemy
 
@@ -20,6 +20,7 @@ class User(db.Model):
     # id = db.Column(String(), primary_key=True)
     user_name = db.Column(String(), nullable=False, unique=True, index=True)
     user_email = db.Column(String(), nullable=False, unique=True)
-    user_password = db.Column(String(), nullable=False, unique=True)
+    user_password = db.Column(String(), nullable=False)
     user_phone = db.Column(String(), nullable=True, unique=True)
     user_address = db.Column(String(), nullable=True)
+    is_admin = db.Column(Boolean(), default=False)

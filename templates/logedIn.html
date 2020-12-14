@@ -1,1 +1,26 @@
-<h1>Welcome</h1>
+{% include './partials/header.html' %}
+<div class="perspective-text">
+    <div class="perspective-line-container">
+    <div class="perspective-line">
+    <p></p>
+    <p>Welcome,</p>
+    </div>
+    <div class="perspective-line">
+    <p>Welcome,</p>
+    <p>{{userName}}</p>
+    </div>
+    <div class="perspective-line">
+    <p>{{userName}}</p>
+    <p>You're</p>
+    </div>
+    <div class="perspective-line">
+    <p>You're</p>
+    <p>The Best</p>
+    </div>
+    <div class="perspective-line">
+    <p>The Best</p>
+    <p></p>
+    </div>
+    </div>
+</div>
+{% include './partials/footer.html' %}

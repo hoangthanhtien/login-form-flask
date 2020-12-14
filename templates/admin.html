@@ -1,0 +1,27 @@
+{% include './partials/header.html' %}
+<h1>This is admin route</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Name</th>
+      <th scope="col">Email</th>
+      <th scope="col">Phone</th>
+      <th scope="col">Address</th>
+      <th scope="col">Admin</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in user_list%}
+    <tr>
+      <th scope="row">{{user.id}}</th>
+      <td>{{user.user_name}}</td>
+      <td>{{user.user_email}}</td>
+      <td>{{user.user_phone}}</td>
+      <td>{{user.user_address}}</td>
+      <td>{{user.is_admin}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% include './partials/footer.html' %}
