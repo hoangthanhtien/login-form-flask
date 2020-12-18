@@ -1,0 +1,56 @@
+{% include './partials/header.html' %}
+<h1>Update {{user.user_name}}'s info:</h1>
+<form id="updateForm" method="PUT" action="/admin?user_id={{user.id}}">
+  <div class="form-group">
+    <label for="username">Username: </label>
+    <input
+      class="form-control"
+      type="text"
+      name="user_name"
+      id="username"
+      value="{{user.user_name}}"
+    />
+  </div>
+  <div class="form-group">
+    <label for="useremail">Email: </label>
+    <input
+      class="form-control"
+      type="email"
+      name="user_email"
+      id="useremail"
+      value="{{user.user_email}}"
+    />
+  </div>
+  <div class="form-group">
+    <label for="password">Password: </label>
+    <input
+      class="form-control"
+      type="password"
+      name="user_password"
+      id="password"
+      value="{{user.user_password}}"
+    />
+  </div>
+  <div class="form-group">
+    <label for="userphone">Phone: </label>
+    <input
+      class="form-control"
+      type="text"
+      name="user_phone"
+      id="userphone"
+      value="{{user.user_phone}}"
+    />
+  </div>
+  <div class="form-group">
+    <label for="address">Address: </label>
+    <input
+      class="form-control"
+      type="text"
+      name="user_address"
+      id="address"
+      value="{{user.user_address}}"
+    />
+  </div>
+  <button type="submit" class="btn btn-block btn-warning">Update Info</button>
+</form>
+{% include './partials/footer.html' %}

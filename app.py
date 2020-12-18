@@ -1,8 +1,3 @@
-# from models import user
-# from models.user import db
-
-
-
 import re
 from flask.templating import render_template_string
 from re import U
@@ -27,8 +22,6 @@ def init_db():
     db.init_app()
     db.app = app
     db.create_all()
-
-
 # Ham xac minh email va password
 def valid_login(user_email, password):
     print("Trong valid login")
@@ -46,6 +39,57 @@ def valid_login(user_email, password):
             return False
 
 
+def getUserName():
+    user_info = db.session.query(User).filter(
+        User.user_email == request.form['user_email']).first()
+    userName = user_info.user_name
+    session['user_id'] = user_info.id
+    return userName
+
+
+def createUser(user_name, user_email, user_password, user_phone, user_address):
+    # Lay so luong user co trong database
+    user_quantity = db.session.query(User).count()
+    # Kiem tra input nhap vao (Khong duoc trung email voi tai khoan khac)
+    duplicate_email_exists = db.session.query(
+        User).filter(User.user_email == user_email).first()
+    if duplicate_email_exists is not None:
+        return render_template("error.html")
+    # Neu khong trung email thi tao tai khoan
+    else:
+        new_user = User()
+        # new_user.id = str(user_quantity + 1)
+        new_user.user_address = user_address if user_address else None
+        new_user.user_email = user_email
+        new_user.user_name = user_name if user_name else "User" + \
+            str(user_quantity + 1)
+        new_user.user_password = user_password
+        new_user.user_phone = user_phone if user_phone else None
+        # Luu vao db
+        db.session.add(new_user)
+        db.session.commit()
+        user_info = db.session.query(User).filter(
+            User.user_email == user_email).first()
+        userName = user_info.user_name
+        # Tao session
+        session['user_id'] = user_info.id
+        return userName
+
+
+def get_user_info(user_id):
+    user_info = db.session.query(User).filter(User.id == user_id).first()
+    data = user_info.__dict__
+    return user_info
+
+
+def get_all_user():
+    result = []
+    user_list = db.session.query(User).all()
+    for user in user_list:
+        result.append(user.__dict__)
+    return result
+
+
 @app.route('/', methods=['GET'])
 def home():
     if request.method == "GET":
@@ -57,12 +101,9 @@ def login():
     if request.method == "GET":
         return render_template('login.html')
     if request.method == 'POST':
-        print("POST login")
         # Xac minh user email va password
         if valid_login(request.form['user_email'], request.form['user_password']):
-            user_info = db.session.query(User).filter(User.user_email == request.form['user_email']).first()
-            userName = user_info.user_name
-            session['user_id'] = user_info.id
+            userName = getUserName()
             return render_template('logedIn.html', userName=userName)
         else:
             return render_template('error.html')
@@ -83,70 +124,36 @@ def register():
         if user_name is None or user_email is None or user_password is None:
             return render_template('error.html')
         else:
-        # try:
-            # Lay so luong user co trong database
-            user_quantity = db.session.query(User).count()
-            # Kiem tra input nhap vao (Khong duoc trung email voi tai khoan khac)
-            duplicate_email_exists = db.session.query(
-                User).filter(User.user_email == user_email).first()
-            if duplicate_email_exists is not None:
-                return render_template("error.html")
-            # Neu khong trung email thi tao tai khoan
-            else:
-                new_user = User()
-                # new_user.id = str(user_quantity + 1)
-                new_user.user_address = user_address if user_address else None
-                new_user.user_email = user_email
-                new_user.user_name = user_name if user_name else "User" + \
-                    str(user_quantity + 1)
-                new_user.user_password = user_password
-                new_user.user_phone = user_phone if user_phone else None
-                # Luu vao db
-                db.session.add(new_user)
-                db.session.commit()
-                user_info = db.session.query(User).filter(User.user_email == user_email).first()
-                userName = user_info.user_name
-                # Tao session 
-                session['user_id'] = user_info.id
-                return render_template('logedIn.html', userName=userName)
+            userName = createUser(user_name, user_email,
+                                  user_password, user_phone, user_address)
+            return render_template('logedIn.html', userName=userName)
 
-        # except Exception as e:
-        #     return render_template('error.html')
 
-@app.route('/admin', methods=['GET', 'POST','PUT' ,'DELETE'])
+@app.route('/admin', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def admin():
-    current_user_info = db.session.query(User).filter(User.id == session['user_id']).first()
+    current_user_info = db.session.query(User).filter(
+        User.id == session['user_id']).first()
     if current_user_info.is_admin == True:
         if request.method == "GET":
-            # Lay ra tat ca user
-            result = []
-            user_list = db.session.query(User).all()
-            for user in user_list:
-                result.append(user.__dict__)
-            return render_template('admin.html', user_list=result)
-        if request.method == "PUT":
-            # Chinh sua thong tin user
+            # Hien thi thong tin chi tiet cua user theo id
             user_id = request.args.get("user_id")
-            new_name = request.form['user_name'] 
-            new_email = request.form['user_email']
-            new_phone = request.form['user_phone']
-            new_address = request.form['user_address']
-
-            user_info = db.session.query(User).filter(User.id == user_id).first()
-            user_info.user_name = new_name
-            user_info.user_email = new_email
-            user_info.user_phone = new_phone
-            user_info.user_address = new_address
-            db.session.commit()
-            
-            return redirect("/admin")
+            if user_id:
+                user_info = get_user_info(user_id)
+                if user_info:
+                    return render_template('user_info.html', user=user_info)
+            # Lay ra tat ca user
+            all_user_info = get_all_user()
+            return render_template('admin.html', user_list=all_user_info)
     else:
         return render_template('restricted.html')
 
-@app.route('/logout', methods=['GET', 'POST', 'DELETE'])
+
+@app.route('/logout', methods=['GET'])
 def logout():
-    session.pop('user_id',None)
+    # Xoa session
+    session.pop('user_id', None)
     return render_template('login.html')
+
 
 if __name__ == '__main__':
     app.init_db()

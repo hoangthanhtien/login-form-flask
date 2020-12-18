@@ -9,6 +9,8 @@
       <th scope="col">Phone</th>
       <th scope="col">Address</th>
       <th scope="col">Admin</th>
+      <th scope="col">Update</th>
+      <th scope="col">Delete</th>
     </tr>
   </thead>
   <tbody>
@@ -20,6 +22,18 @@
       <td>{{user.user_phone}}</td>
       <td>{{user.user_address}}</td>
       <td>{{user.is_admin}}</td>
+      <td><a href="/admin?user_id={{user.id}}">Update</a></td>
+      <td>
+        <form
+          action="/admin?user_id={{user.id}}&delete=true"
+          method="PUT"
+          id="delete-form"
+        >
+          <button class="btn btn-danger" type="submit" form="delete-form">
+            DELETE
+          </button>
+        </form>
+      </td>
     </tr>
     {% endfor %}
   </tbody>
